@@ -1,0 +1,677 @@
+Index: README.md
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/README.md b/README.md
+--- a/README.md
++++ b/README.md	(date 1765107746147)
+@@ -1,135 +1,2 @@
+-# My Gateway
+-
+-My Gateway 是一个基于Java开发的现代化API网关框架，支持插件化扩展和异步非阻塞处理。
+-
+-## 项目结构
+-
+-```
+-my-gateway/
+-├── gateway-common          # 公共模块，包含通用工具类、常量和异常定义
+-├── gateway-plugin-api      # 插件API模块，定义插件接口和核心组件
+-├── gateway-core            # 核心模块（待实现）
+-```
+-
+-## 模块说明
+-
+-### gateway-common
+-
+-公共基础模块，包含以下内容：
+-
+-- 常量定义：如HTTP头信息常量
+-- 异常体系：统一的异常处理框架
+-- 工具类：JSON工具类等
+-
+-### gateway-plugin-api
+-
+-插件API模块，定义了网关的核心接口和组件：
+-
+-- `GatewayPlugin`: 网关插件基础接口
+-- `SyncGatewayPlugin`: 同步插件接口
+-- `AsyncGatewayPlugin`: 异步插件接口
+-- `GatewayFilter`: 网关过滤器接口
+-- `GatewayContext`: 网关上下文接口
+-- `GatewayRequest`: 网关请求接口
+-- `GatewayResponse`: 网关响应接口
+-- `ExecutionPhase`: 插件执行阶段枚举
+-- `PluginResult`: 插件执行结果类
+-
+-### gateway-core
+-
+-网关核心模块，负责协调各组件工作（尚未实现）。
+-
+-## 核心特性
+-
+-### 1. 插件化架构
+-
+-网关采用插件化设计，支持通过实现不同的插件接口来扩展功能。
+-
+-### 2. 执行阶段
+-
+-插件可以在以下不同阶段执行：
+-
+-- `BEFORE_ROUTING`: 路由之前
+-- `AFTER_ROUTING`: 路由之后
+-- `BEFORE_UPSTREAM`: 上游调用之前
+-- `AFTER_UPSTREAM`: 上游调用之后
+-- `ON_ERROR`: 发生错误时
+-
+-### 3. 异步非阻塞处理
+-
+-支持同步和异步两种插件执行方式，充分利用现代JVM的并发处理能力。
+-
+-### 4. 过滤器链
+-
+-提供过滤器链机制，允许按顺序处理请求和响应。
+-
+-## 快速开始
+-
+-### 环境要求
+-
+-- Java 25或更高版本
+-- Maven 3.6+
+-
+-### 构建项目
+-
+-```bash
+-mvn clean install
+-```
+-
+-## 使用示例
+-
+-### 创建自定义插件
+-
+-```java
+-public class CustomPlugin implements SyncGatewayPlugin {
+-    
+-    @Override
+-    public String getId() {
+-        return "custom-plugin";
+-    }
+-    
+-    @Override
+-    public String getName() {
+-        return "Custom Plugin";
+-    }
+-    
+-    @Override
+-    public String getVersion() {
+-        return "1.0.0";
+-    }
+-    
+-    @Override
+-    public Set<ExecutionPhase> getSupportedPhases() {
+-        return Set.of(ExecutionPhase.BEFORE_ROUTING);
+-    }
+-    
+-    @Override
+-    public void init(PluginConfig config) throws GatewayException {
+-        // 初始化插件
+-    }
+-    
+-    @Override
+-    public PluginResult executeSync(GatewayContext context) throws Exception {
+-        // 插件业务逻辑
+-        return PluginResult.interrupt();
+-    }
+-    
+-    @Override
+-    public void destroy() {
+-        // 销毁插件资源
+-    }
+-}
+-```
+-
+-## 开发计划
+-
+-1. 实现gateway-core模块
+-2. 添加配置管理功能
+-3. 实现路由分发机制
+-4. 提供完整的HTTP客户端支持
+-5. 添加监控和指标收集功能
+-6. 完善单元测试覆盖
+-
+-## 许可证
+-
+-本项目采用Apache License 2.0许可证。
+\ No newline at end of file
++# my-gateway
++A simple gateway implementation for exercise
+Index: gateway-core/src/main/java/io/homeey/gateway/core/context/DefaultRequest.java
+===================================================================
+diff --git a/gateway-core/src/main/java/io/homeey/gateway/core/context/DefaultRequest.java b/gateway-core/src/main/java/io/homeey/gateway/core/context/DefaultRequest.java
+deleted file mode 100644
+--- a/gateway-core/src/main/java/io/homeey/gateway/core/context/DefaultRequest.java
++++ /dev/null
+@@ -1,32 +0,0 @@
+-package io.homeey.gateway.core.context;
+-
+-import io.homeey.gateway.plugin.api.context.GatewayRequest;
+-
+-import java.io.InputStream;
+-import java.util.List;
+-import java.util.Map;
+-
+-/**
+- *
+- * @author jt4mrg@gmail.com <Just for fun.Let's do it>
+- * @since 13:48 2025-12-06
+- **/
+-public record DefaultRequest(String method, String path, Map<String, List<String>> queryParams,
+-                             Map<String, List<String>> headers, InputStream body) implements GatewayRequest {
+-
+-    @Override
+-    public String getHeader(String name) {
+-        List<String> values = headers.get(name);
+-        return (values == null || values.isEmpty()) ? null : values.get(0);
+-    }
+-
+-    @Override
+-    public Map<String, List<String>> headers() {
+-        return this.headers;
+-    }
+-
+-    @Override
+-    public InputStream body() {
+-        return this.body;
+-    }
+-}
+Index: gateway-core/pom.xml
+===================================================================
+diff --git a/gateway-core/pom.xml b/gateway-core/pom.xml
+deleted file mode 100644
+--- a/gateway-core/pom.xml
++++ /dev/null
+@@ -1,41 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project xmlns="http://maven.apache.org/POM/4.0.0"
+-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+-    <modelVersion>4.0.0</modelVersion>
+-    <parent>
+-        <groupId>io.homeey</groupId>
+-        <artifactId>my-gateway</artifactId>
+-        <version>1.0-SNAPSHOT</version>
+-    </parent>
+-
+-    <artifactId>gateway-core</artifactId>
+-
+-    <properties>
+-        <maven.compiler.source>25</maven.compiler.source>
+-        <maven.compiler.target>25</maven.compiler.target>
+-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+-    </properties>
+-    <dependencies>
+-        <dependency>
+-            <groupId>io.homeey</groupId>
+-            <artifactId>gateway-common</artifactId>
+-            <version>${parent.version}</version>
+-        </dependency>
+-        <dependency>
+-            <groupId>io.homeey</groupId>
+-            <artifactId>gateway-plugin-api</artifactId>
+-            <version>${parent.version}</version>
+-        </dependency>
+-        <dependency>
+-            <groupId>io.homeey</groupId>
+-            <artifactId>gateway-routing-api</artifactId>
+-            <version>${parent.version}</version>
+-        </dependency>
+-        <dependency>
+-            <groupId>io.homeey</groupId>
+-            <artifactId>gateway-plugin-runtime-api</artifactId>
+-            <version>${parent.version}</version>
+-        </dependency>
+-    </dependencies>
+-</project>
+\ No newline at end of file
+Index: gateway-common/pom.xml
+===================================================================
+diff --git a/gateway-common/pom.xml b/gateway-common/pom.xml
+deleted file mode 100644
+--- a/gateway-common/pom.xml
++++ /dev/null
+@@ -1,20 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project xmlns="http://maven.apache.org/POM/4.0.0"
+-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+-    <modelVersion>4.0.0</modelVersion>
+-    <parent>
+-        <groupId>io.homeey</groupId>
+-        <artifactId>my-gateway</artifactId>
+-        <version>1.0-SNAPSHOT</version>
+-    </parent>
+-
+-    <artifactId>gateway-common</artifactId>
+-
+-    <properties>
+-        <maven.compiler.source>25</maven.compiler.source>
+-        <maven.compiler.target>25</maven.compiler.target>
+-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+-    </properties>
+-
+-</project>
+\ No newline at end of file
+Index: gateway-config/pom.xml
+===================================================================
+diff --git a/gateway-config/pom.xml b/gateway-config/pom.xml
+deleted file mode 100644
+--- a/gateway-config/pom.xml
++++ /dev/null
+@@ -1,20 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project xmlns="http://maven.apache.org/POM/4.0.0"
+-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+-    <modelVersion>4.0.0</modelVersion>
+-    <parent>
+-        <groupId>io.homeey</groupId>
+-        <artifactId>my-gateway</artifactId>
+-        <version>1.0-SNAPSHOT</version>
+-    </parent>
+-
+-    <artifactId>gateway-config</artifactId>
+-
+-    <properties>
+-        <maven.compiler.source>25</maven.compiler.source>
+-        <maven.compiler.target>25</maven.compiler.target>
+-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+-    </properties>
+-
+-</project>
+\ No newline at end of file
+Index: gateway-plugins/pom.xml
+===================================================================
+diff --git a/gateway-plugins/pom.xml b/gateway-plugins/pom.xml
+deleted file mode 100644
+--- a/gateway-plugins/pom.xml
++++ /dev/null
+@@ -1,20 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project xmlns="http://maven.apache.org/POM/4.0.0"
+-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+-    <modelVersion>4.0.0</modelVersion>
+-    <parent>
+-        <groupId>io.homeey</groupId>
+-        <artifactId>my-gateway</artifactId>
+-        <version>1.0-SNAPSHOT</version>
+-    </parent>
+-
+-    <artifactId>gateway-plugins</artifactId>
+-
+-    <properties>
+-        <maven.compiler.source>25</maven.compiler.source>
+-        <maven.compiler.target>25</maven.compiler.target>
+-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+-    </properties>
+-
+-</project>
+\ No newline at end of file
+Index: gateway-bootstrap/pom.xml
+===================================================================
+diff --git a/gateway-bootstrap/pom.xml b/gateway-bootstrap/pom.xml
+deleted file mode 100644
+--- a/gateway-bootstrap/pom.xml
++++ /dev/null
+@@ -1,20 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project xmlns="http://maven.apache.org/POM/4.0.0"
+-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+-    <modelVersion>4.0.0</modelVersion>
+-    <parent>
+-        <groupId>io.homeey</groupId>
+-        <artifactId>my-gateway</artifactId>
+-        <version>1.0-SNAPSHOT</version>
+-    </parent>
+-
+-    <artifactId>gateway-bootstrap</artifactId>
+-
+-    <properties>
+-        <maven.compiler.source>25</maven.compiler.source>
+-        <maven.compiler.target>25</maven.compiler.target>
+-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+-    </properties>
+-
+-</project>
+\ No newline at end of file
+Index: gateway-plugin-api/pom.xml
+===================================================================
+diff --git a/gateway-plugin-api/pom.xml b/gateway-plugin-api/pom.xml
+deleted file mode 100644
+--- a/gateway-plugin-api/pom.xml
++++ /dev/null
+@@ -1,27 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project xmlns="http://maven.apache.org/POM/4.0.0"
+-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+-    <modelVersion>4.0.0</modelVersion>
+-    <parent>
+-        <groupId>io.homeey</groupId>
+-        <artifactId>my-gateway</artifactId>
+-        <version>1.0-SNAPSHOT</version>
+-        <relativePath>../pom.xml</relativePath>
+-    </parent>
+-
+-    <artifactId>gateway-plugin-api</artifactId>
+-
+-    <properties>
+-        <maven.compiler.source>25</maven.compiler.source>
+-        <maven.compiler.target>25</maven.compiler.target>
+-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+-    </properties>
+-    <dependencies>
+-        <dependency>
+-            <groupId>io.homeey</groupId>
+-            <artifactId>gateway-common</artifactId>
+-            <version>${parent.version}</version>
+-        </dependency>
+-    </dependencies>
+-</project>
+\ No newline at end of file
+Index: gateway-routing-api/pom.xml
+===================================================================
+diff --git a/gateway-routing-api/pom.xml b/gateway-routing-api/pom.xml
+deleted file mode 100644
+--- a/gateway-routing-api/pom.xml
++++ /dev/null
+@@ -1,26 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project xmlns="http://maven.apache.org/POM/4.0.0"
+-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+-    <modelVersion>4.0.0</modelVersion>
+-    <parent>
+-        <groupId>io.homeey</groupId>
+-        <artifactId>my-gateway</artifactId>
+-        <version>1.0-SNAPSHOT</version>
+-    </parent>
+-
+-    <artifactId>gateway-routing-api</artifactId>
+-
+-    <properties>
+-        <maven.compiler.source>25</maven.compiler.source>
+-        <maven.compiler.target>25</maven.compiler.target>
+-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+-    </properties>
+-    <dependencies>
+-        <dependency>
+-            <groupId>io.homeey</groupId>
+-            <artifactId>gateway-plugin-api</artifactId>
+-            <version>${parent.version}</version>
+-        </dependency>
+-    </dependencies>
+-</project>
+\ No newline at end of file
+Index: gateway-observability/pom.xml
+===================================================================
+diff --git a/gateway-observability/pom.xml b/gateway-observability/pom.xml
+deleted file mode 100644
+--- a/gateway-observability/pom.xml
++++ /dev/null
+@@ -1,20 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project xmlns="http://maven.apache.org/POM/4.0.0"
+-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+-    <modelVersion>4.0.0</modelVersion>
+-    <parent>
+-        <groupId>io.homeey</groupId>
+-        <artifactId>my-gateway</artifactId>
+-        <version>1.0-SNAPSHOT</version>
+-    </parent>
+-
+-    <artifactId>gateway-observability</artifactId>
+-
+-    <properties>
+-        <maven.compiler.source>25</maven.compiler.source>
+-        <maven.compiler.target>25</maven.compiler.target>
+-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+-    </properties>
+-
+-</project>
+\ No newline at end of file
+Index: gateway-plugin-runtime/pom.xml
+===================================================================
+diff --git a/gateway-plugin-runtime/pom.xml b/gateway-plugin-runtime/pom.xml
+deleted file mode 100644
+--- a/gateway-plugin-runtime/pom.xml
++++ /dev/null
+@@ -1,41 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project xmlns="http://maven.apache.org/POM/4.0.0"
+-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+-    <modelVersion>4.0.0</modelVersion>
+-    <parent>
+-        <groupId>io.homeey</groupId>
+-        <artifactId>my-gateway</artifactId>
+-        <version>1.0-SNAPSHOT</version>
+-    </parent>
+-
+-    <artifactId>gateway-plugin-runtime</artifactId>
+-
+-    <properties>
+-        <maven.compiler.source>25</maven.compiler.source>
+-        <maven.compiler.target>25</maven.compiler.target>
+-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+-    </properties>
+-    <dependencies>
+-        <dependency>
+-            <groupId>io.homeey</groupId>
+-            <artifactId>gateway-plugin-runtime-api</artifactId>
+-            <version>${parent.version}</version>
+-        </dependency>
+-        <dependency>
+-            <groupId>io.homeey</groupId>
+-            <artifactId>gateway-plugin-api</artifactId>
+-            <version>${parent.version}</version>
+-        </dependency>
+-        <dependency>
+-            <groupId>io.homeey</groupId>
+-            <artifactId>gateway-routing-api</artifactId>
+-            <version>${parent.version}</version>
+-        </dependency>
+-        <dependency>
+-            <groupId>io.homeey</groupId>
+-            <artifactId>gateway-common</artifactId>
+-            <version>${parent.version}</version>
+-        </dependency>
+-    </dependencies>
+-</project>
+\ No newline at end of file
+Index: gateway-transport-netty/pom.xml
+===================================================================
+diff --git a/gateway-transport-netty/pom.xml b/gateway-transport-netty/pom.xml
+deleted file mode 100644
+--- a/gateway-transport-netty/pom.xml
++++ /dev/null
+@@ -1,20 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project xmlns="http://maven.apache.org/POM/4.0.0"
+-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+-    <modelVersion>4.0.0</modelVersion>
+-    <parent>
+-        <groupId>io.homeey</groupId>
+-        <artifactId>my-gateway</artifactId>
+-        <version>1.0-SNAPSHOT</version>
+-    </parent>
+-
+-    <artifactId>gateway-transport-netty</artifactId>
+-
+-    <properties>
+-        <maven.compiler.source>25</maven.compiler.source>
+-        <maven.compiler.target>25</maven.compiler.target>
+-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+-    </properties>
+-
+-</project>
+\ No newline at end of file
+Index: gateway-plugin-runtime-api/pom.xml
+===================================================================
+diff --git a/gateway-plugin-runtime-api/pom.xml b/gateway-plugin-runtime-api/pom.xml
+deleted file mode 100644
+--- a/gateway-plugin-runtime-api/pom.xml
++++ /dev/null
+@@ -1,31 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project xmlns="http://maven.apache.org/POM/4.0.0"
+-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+-    <modelVersion>4.0.0</modelVersion>
+-    <parent>
+-        <groupId>io.homeey</groupId>
+-        <artifactId>my-gateway</artifactId>
+-        <version>1.0-SNAPSHOT</version>
+-    </parent>
+-
+-    <artifactId>gateway-plugin-runtime-api</artifactId>
+-
+-    <properties>
+-        <maven.compiler.source>25</maven.compiler.source>
+-        <maven.compiler.target>25</maven.compiler.target>
+-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+-    </properties>
+-    <dependencies>
+-        <dependency>
+-            <groupId>io.homeey</groupId>
+-            <artifactId>gateway-plugin-api</artifactId>
+-            <version>${parent.version}</version>
+-        </dependency>
+-        <dependency>
+-            <groupId>io.homeey</groupId>
+-            <artifactId>gateway-routing-api</artifactId>
+-            <version>${parent.version}</version>
+-        </dependency>
+-    </dependencies>
+-</project>
+\ No newline at end of file
+Index: pom.xml
+===================================================================
+diff --git a/pom.xml b/pom.xml
+deleted file mode 100644
+--- a/pom.xml
++++ /dev/null
+@@ -1,41 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project xmlns="http://maven.apache.org/POM/4.0.0"
+-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+-    <modelVersion>4.0.0</modelVersion>
+-
+-    <groupId>io.homeey</groupId>
+-    <artifactId>my-gateway</artifactId>
+-    <version>1.0-SNAPSHOT</version>
+-    <packaging>pom</packaging>
+-    <modules>
+-        <module>gateway-common</module>
+-        <module>gateway-plugin-api</module>
+-        <module>gateway-core</module>
+-        <module>gateway-config</module>
+-        <module>gateway-routing-api</module>
+-        <module>gateway-plugin-runtime</module>
+-        <module>gateway-transport-netty</module>
+-        <module>gateway-bootstrap</module>
+-        <module>gateway-observability</module>
+-        <module>gateway-plugins</module>
+-        <module>gateway-plugin-runtime-api</module>
+-    </modules>
+-
+-    <properties>
+-        <maven.compiler.source>25</maven.compiler.source>
+-        <maven.compiler.target>25</maven.compiler.target>
+-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+-    </properties>
+-
+-    <dependencyManagement>
+-        <dependencies>
+-        </dependencies>
+-    </dependencyManagement>
+-    <build>
+-        <pluginManagement>
+-            <plugins>
+-            </plugins>
+-        </pluginManagement>
+-    </build>
+-</project>
+\ No newline at end of file
+diff --git a/gateway-core/src/main/java/io/homeey/gateway/core/filter/UpstreamInvoker.java b/gateway-core/src/main/java/io/homeey/gateway/core/filter/UpstreamInvoker.java
+deleted file mode 100644
+diff --git a/gateway-core/src/main/java/io/homeey/gateway/core/filter/FilterChainFactory.java b/gateway-core/src/main/java/io/homeey/gateway/core/filter/FilterChainFactory.java
+deleted file mode 100644
+diff --git a/gateway-core/src/main/java/io/homeey/gateway/core/filter/PluginFilterAdapter.java b/gateway-core/src/main/java/io/homeey/gateway/core/filter/PluginFilterAdapter.java
+deleted file mode 100644
+diff --git a/gateway-core/src/main/java/io/homeey/gateway/core/filter/DefaultGatewayFilterChain.java b/gateway-core/src/main/java/io/homeey/gateway/core/filter/DefaultGatewayFilterChain.java
+deleted file mode 100644
+diff --git a/gateway-core/src/main/java/io/homeey/gateway/core/context/DefaultResponse.java b/gateway-core/src/main/java/io/homeey/gateway/core/context/DefaultResponse.java
+deleted file mode 100644
+diff --git a/gateway-core/src/main/java/io/homeey/gateway/core/context/DefaultGatewayContext.java b/gateway-core/src/main/java/io/homeey/gateway/core/context/DefaultGatewayContext.java
+deleted file mode 100644
+diff --git a/gateway-core/src/main/java/io/homeey/gateway/core/context/DefaultExecutionAttributes.java b/gateway-core/src/main/java/io/homeey/gateway/core/context/DefaultExecutionAttributes.java
+deleted file mode 100644
+diff --git a/gateway-core/src/main/java/io/homeey/gateway/core/dispatcher/ErrorHandler.java b/gateway-core/src/main/java/io/homeey/gateway/core/dispatcher/ErrorHandler.java
+deleted file mode 100644
+diff --git a/gateway-core/src/main/java/io/homeey/gateway/core/dispatcher/GatewayDispatcher.java b/gateway-core/src/main/java/io/homeey/gateway/core/dispatcher/GatewayDispatcher.java
+deleted file mode 100644
+diff --git a/gateway-common/src/main/java/io/homeey/gateway/common/util/JsonUtils.java b/gateway-common/src/main/java/io/homeey/gateway/common/util/JsonUtils.java
+deleted file mode 100644
+diff --git a/gateway-common/src/main/java/io/homeey/gateway/common/constants/GatewayHeaders.java b/gateway-common/src/main/java/io/homeey/gateway/common/constants/GatewayHeaders.java
+deleted file mode 100644
+diff --git a/gateway-common/src/main/java/io/homeey/gateway/common/exception/PluginException.java b/gateway-common/src/main/java/io/homeey/gateway/common/exception/PluginException.java
+deleted file mode 100644
+diff --git a/gateway-common/src/main/java/io/homeey/gateway/common/exception/GatewayException.java b/gateway-common/src/main/java/io/homeey/gateway/common/exception/GatewayException.java
+deleted file mode 100644
+diff --git a/gateway-common/src/main/java/io/homeey/gateway/common/exception/ConfigurationException.java b/gateway-common/src/main/java/io/homeey/gateway/common/exception/ConfigurationException.java
+deleted file mode 100644
+diff --git a/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/filter/GatewayFilter.java b/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/filter/GatewayFilter.java
+deleted file mode 100644
+diff --git a/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/filter/GatewayFilterChain.java b/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/filter/GatewayFilterChain.java
+deleted file mode 100644
+diff --git a/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/plugin/PluginConfig.java b/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/plugin/PluginConfig.java
+deleted file mode 100644
+diff --git a/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/plugin/PluginResult.java b/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/plugin/PluginResult.java
+deleted file mode 100644
+diff --git a/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/plugin/GatewayPlugin.java b/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/plugin/GatewayPlugin.java
+deleted file mode 100644
+diff --git a/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/plugin/BlockingPlugin.java b/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/plugin/BlockingPlugin.java
+deleted file mode 100644
+diff --git a/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/plugin/SyncGatewayPlugin.java b/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/plugin/SyncGatewayPlugin.java
+deleted file mode 100644
+diff --git a/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/plugin/AsyncGatewayPlugin.java b/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/plugin/AsyncGatewayPlugin.java
+deleted file mode 100644
+diff --git a/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/context/GatewayContext.java b/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/context/GatewayContext.java
+deleted file mode 100644
+diff --git a/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/context/GatewayRequest.java b/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/context/GatewayRequest.java
+deleted file mode 100644
+diff --git a/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/context/GatewayResponse.java b/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/context/GatewayResponse.java
+deleted file mode 100644
+diff --git a/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/context/ExecutionAttributes.java b/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/context/ExecutionAttributes.java
+deleted file mode 100644
+diff --git a/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/ExecutionPhase.java b/gateway-plugin-api/src/main/java/io/homeey/gateway/plugin/api/ExecutionPhase.java
+deleted file mode 100644
+diff --git a/gateway-routing-api/src/main/java/io/homeey/gateway/routing/api/Route.java b/gateway-routing-api/src/main/java/io/homeey/gateway/routing/api/Route.java
+deleted file mode 100644
+diff --git a/gateway-routing-api/src/main/java/io/homeey/gateway/routing/api/Upstream.java b/gateway-routing-api/src/main/java/io/homeey/gateway/routing/api/Upstream.java
+deleted file mode 100644
+diff --git a/gateway-routing-api/src/main/java/io/homeey/gateway/routing/api/RouteTable.java b/gateway-routing-api/src/main/java/io/homeey/gateway/routing/api/RouteTable.java
+deleted file mode 100644
+diff --git a/gateway-routing-api/src/main/java/io/homeey/gateway/routing/api/RouteLocator.java b/gateway-routing-api/src/main/java/io/homeey/gateway/routing/api/RouteLocator.java
+deleted file mode 100644
+diff --git a/gateway-routing-api/src/main/java/io/homeey/gateway/routing/api/PluginBinding.java b/gateway-routing-api/src/main/java/io/homeey/gateway/routing/api/PluginBinding.java
+deleted file mode 100644
+diff --git a/gateway-plugin-runtime/src/main/java/io/homeey/gateway/plugin/runtime/DefaultPluginManager.java b/gateway-plugin-runtime/src/main/java/io/homeey/gateway/plugin/runtime/DefaultPluginManager.java
+deleted file mode 100644
+diff --git a/gateway-plugin-runtime-api/src/main/java/io/homeey/gateway/runtime/api/PluginManager.java b/gateway-plugin-runtime-api/src/main/java/io/homeey/gateway/runtime/api/PluginManager.java
+deleted file mode 100644
