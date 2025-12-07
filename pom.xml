@@ -30,6 +30,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>4.2.7.Final</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <build>

@@ -16,5 +16,46 @@
         <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
+    <dependencies>
+        <dependency>
+            <groupId>io.homeey</groupId>
+            <artifactId>gateway-common</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.homeey</groupId>
+            <artifactId>gateway-plugin-api</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.homeey</groupId>
+            <artifactId>gateway-routing-api</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.homeey</groupId>
+            <artifactId>gateway-plugin-runtime-api</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.homeey</groupId>
+            <artifactId>gateway-core</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.homeey</groupId>
+            <artifactId>gateway-plugin-runtime</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.homeey</groupId>
+            <artifactId>gateway-config</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.homeey</groupId>
+            <artifactId>gateway-transport-netty</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
+    </dependencies>
 </project>
