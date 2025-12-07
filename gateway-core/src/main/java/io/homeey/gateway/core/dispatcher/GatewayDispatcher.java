@@ -39,7 +39,7 @@ public class GatewayDispatcher {
                 errorHandler.handleNotFound(ctx);
                 return;
             }
-            ctx.setRouterId(route.getId());
+            ctx.setRouterId(route.id());
 
             List<GatewayFilter> gatewayFilters = filterChainFactory.buildPreUpstreamFilters(route);
             DefaultGatewayFilterChain chain = new DefaultGatewayFilterChain(gatewayFilters, upstreamInvoker);

@@ -13,12 +13,12 @@ public interface Upstream {
      * 
      * @return 上游服务名称
      */
-    String getName();
+    String name();
 
     /**
      * 获取上游服务端点列表
      * 
      * @return 上游服务端点URL列表
      */
-    List<String> getEndpoints();
+    List<String> endpoints();
 }

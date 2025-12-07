@@ -29,7 +29,7 @@ public class DefaultPluginManager implements PluginManager {
 
     @Override
     public List<GatewayPlugin> getPluginsForRouteAndPhase(Route route, ExecutionPhase phase) {
-        Map<ExecutionPhase, List<String>> phaseListMap = routePhasePluginIds.get(route.getId());
+        Map<ExecutionPhase, List<String>> phaseListMap = routePhasePluginIds.get(route.id());
         if (phaseListMap == null) {
             return Collections.emptyList();
         }
@@ -79,22 +79,22 @@ public class DefaultPluginManager implements PluginManager {
         ConcurrentHashMap<String, Map<ExecutionPhase, List<String>>> newCache = new ConcurrentHashMap<>();
         for (Route route : routes) {
             EnumMap<ExecutionPhase, List<String>> phaseMap = new EnumMap<ExecutionPhase, List<String>>(ExecutionPhase.class);
-            if (route.getPluginBindings() != null) {
-                for (Route.PluginBinding binding : route.getPluginBindings()) {
-                    if (!binding.isEnabled()) {
+            if (route.pluginBindings() != null) {
+                for (Route.PluginBinding binding : route.pluginBindings()) {
+                    if (!binding.enabled()) {
                         continue;
                     }
-                    LoadedPlugin lp = plugins.get(binding.getPluginId());
+                    LoadedPlugin lp = plugins.get(binding.pluginId());
                     if (lp == null || !lp.enabled) {
                         continue;
                     }
                     for (ExecutionPhase phase : lp.instance.getSupportedPhases()) {
                         phaseMap.computeIfAbsent(phase, k -> new ArrayList<>())
-                                .add(binding.getPluginId());
+                                .add(binding.pluginId());
                     }
                 }
             }
-            newCache.put(route.getId(), phaseMap);
+            newCache.put(route.id(), phaseMap);
         }
         routePhasePluginIds.clear();
         routePhasePluginIds.putAll(newCache);
@@ -102,22 +102,22 @@ public class DefaultPluginManager implements PluginManager {
 
     public void rebuildRoutePlugins(Route route) {
         EnumMap<ExecutionPhase, List<String>> phaseMap = new EnumMap<ExecutionPhase, List<String>>(ExecutionPhase.class);
-        if (route.getPluginBindings() != null) {
-            for (Route.PluginBinding binding : route.getPluginBindings()) {
-                if (!binding.isEnabled()) {
+        if (route.pluginBindings() != null) {
+            for (Route.PluginBinding binding : route.pluginBindings()) {
+                if (!binding.enabled()) {
                     continue;
                 }
-                LoadedPlugin lp = plugins.get(binding.getPluginId());
+                LoadedPlugin lp = plugins.get(binding.pluginId());
                 if (lp == null || !lp.enabled) {
                     continue;
                 }
                 for (ExecutionPhase phase : lp.instance.getSupportedPhases()) {
                     phaseMap.computeIfAbsent(phase, k -> new ArrayList<>())
-                            .add(binding.getPluginId());
+                            .add(binding.pluginId());
                 }
             }
         }
-        routePhasePluginIds.put(route.getId(), phaseMap);
+        routePhasePluginIds.put(route.id(), phaseMap);
     }
 
     private static class LoadedPlugin {
