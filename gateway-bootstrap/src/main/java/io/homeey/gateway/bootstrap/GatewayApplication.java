@@ -10,10 +10,11 @@ import io.homeey.gateway.plugin.api.context.GatewayContext;
 import io.homeey.gateway.plugin.runtime.manager.DefaultPluginManager;
 import io.homeey.gateway.routing.api.Route;
 import io.homeey.gateway.routing.api.RouteTable;
-import io.homeey.gateway.runtime.api.PluginManager;
 import io.homeey.gateway.transport.netty.server.NettyHttpServer;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -35,8 +36,13 @@ public class GatewayApplication {
 
         DefaultRouteLocator routeLocator = new DefaultRouteLocator(routeTableHolder);
 
-
-        PluginManager manager = new DefaultPluginManager();
+        // plugin manager
+        DefaultPluginManager manager = new DefaultPluginManager();
+        // 加载插件
+        Path path = Paths.get("plugins");
+        manager.loadAndRegisterPlugins(path);
+        //重建路由表
+        manager.rebuildRoutePlugins(routeTable.getAllRoutes());
 
         ExecutorService executorService = Executors.newFixedThreadPool(16);
         FilterChainFactory filterChainFactory = new FilterChainFactory(manager, executorService);
