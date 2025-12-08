@@ -7,6 +7,7 @@
         <groupId>io.homeey</groupId>
         <artifactId>gateway-plugins</artifactId>
         <version>1.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>gateway-plugin-headerrewrite</artifactId>
