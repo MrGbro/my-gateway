@@ -10,11 +10,28 @@
     </parent>
 
     <artifactId>gateway-plugins</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>gateway-plugin-headerrewrite</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.homeey</groupId>
+                <artifactId>gateway-common</artifactId>
+                <version>${parent.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.homeey</groupId>
+                <artifactId>gateway-plugin-api</artifactId>
+                <version>${parent.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>

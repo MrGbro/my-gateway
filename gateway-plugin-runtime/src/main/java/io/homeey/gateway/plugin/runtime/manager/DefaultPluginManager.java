@@ -6,9 +6,11 @@ import io.homeey.gateway.plugin.api.plugin.GatewayPlugin;
 import io.homeey.gateway.plugin.api.plugin.PluginConfig;
 import io.homeey.gateway.plugin.runtime.config.PluginConfigModel;
 import io.homeey.gateway.plugin.runtime.descriptor.PluginDescriptor;
+import io.homeey.gateway.plugin.runtime.loader.PluginLoader;
 import io.homeey.gateway.routing.api.Route;
 import io.homeey.gateway.runtime.api.PluginManager;
 
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,6 +43,17 @@ public class DefaultPluginManager implements PluginManager {
                 .map(it -> it.instance)
                 .sorted(Comparator.comparing(GatewayPlugin::getOrder))
                 .toList();
+    }
+
+    public void loadAndRegisterPlugins(Path pluginDir) {
+        PluginLoader pluginLoader = new PluginLoader(getClass().getClassLoader());
+        List<PluginDescriptor> descriptors = pluginLoader.loadFromDirectory(pluginDir);
+        for (PluginDescriptor descriptor : descriptors) {
+            if (descriptor == null) {
+                continue;
+            }
+            registerPlugin(descriptor);
+        }
     }
 
     public void registerPlugin(PluginDescriptor descriptor) {
