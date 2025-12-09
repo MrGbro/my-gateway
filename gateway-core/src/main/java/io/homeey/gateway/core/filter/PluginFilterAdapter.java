@@ -1,9 +1,8 @@
 package io.homeey.gateway.core.filter;
 
 import io.homeey.gateway.common.exception.PluginException;
-import io.homeey.gateway.plugin.api.*;
+import io.homeey.gateway.plugin.api.ExecutionPhase;
 import io.homeey.gateway.plugin.api.context.GatewayContext;
-import io.homeey.gateway.plugin.api.context.GatewayResponse;
 import io.homeey.gateway.plugin.api.filter.GatewayFilter;
 import io.homeey.gateway.plugin.api.filter.GatewayFilterChain;
 import io.homeey.gateway.plugin.api.plugin.*;
@@ -32,7 +31,7 @@ public class PluginFilterAdapter implements GatewayFilter {
     @Override
     public CompletionStage<Void> filter(GatewayContext context,
                                         GatewayFilterChain chain) {
-        if (plugin.getSupportedPhases().contains(phase)) {
+        if (!plugin.getSupportedPhases().contains(phase)) {
             return chain.filter(context);
         }
         context.setCurrentPhase(phase);
