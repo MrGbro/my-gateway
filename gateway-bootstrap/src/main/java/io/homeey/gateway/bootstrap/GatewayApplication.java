@@ -15,9 +15,9 @@ import io.homeey.gateway.transport.netty.server.NettyHttpServer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutorService;
@@ -76,9 +76,21 @@ public class GatewayApplication {
 
     private static RouteTable buildRouteTable() {
         DefaultUpstream upstream = new DefaultUpstream("dummy-upstream", List.of("http://127.0.0.1:8080"));
-        List<Route.PluginBinding> bindings = Collections.emptyList();
 
-        Route route = new DefaultRoute("dummy-route", "localhost", "/api/**", "GET", upstream, bindings);
+        Map<String, Object> hrConfig = new HashMap<>();
+        HashMap<String, String> responseAdd = new HashMap<>();
+        responseAdd.put("X-Gateway-By", "Netty-Gateway");
+        hrConfig.put("responseAdd", responseAdd);
+
+        Route.PluginBinding binding = new DefaultPluginBinding("header-rewrite", true, hrConfig);
+        List<Route.PluginBinding> bindings = List.of(binding);
+
+        Route route = new DefaultRoute("dummy-route",
+                "localhost",
+                "/api/**",
+                "GET", upstream,
+                bindings);
+
 
         var map = new HashMap<String, Route>();
         map.put(route.id(), route);

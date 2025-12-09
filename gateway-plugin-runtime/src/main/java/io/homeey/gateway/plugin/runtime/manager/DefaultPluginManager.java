@@ -48,6 +48,7 @@ public class DefaultPluginManager implements PluginManager {
     public void loadAndRegisterPlugins(Path pluginDir) {
         PluginLoader pluginLoader = new PluginLoader(getClass().getClassLoader());
         List<PluginDescriptor> descriptors = pluginLoader.loadFromDirectory(pluginDir);
+        System.out.println("Loaded plugins: " + descriptors.size());
         for (PluginDescriptor descriptor : descriptors) {
             if (descriptor == null) {
                 continue;
@@ -62,6 +63,7 @@ public class DefaultPluginManager implements PluginManager {
                     .getDeclaredConstructor()
                     .newInstance();
             LoadedPlugin loadedPlugin = new LoadedPlugin(descriptor, gatewayPlugin);
+            loadedPlugin.initialized = Boolean.TRUE;
             plugins.put(descriptor.id(), loadedPlugin);
         } catch (Exception e) {
             throw new GatewayException("Failed to instantiate plugin: " + descriptor.id(), e);
@@ -81,7 +83,7 @@ public class DefaultPluginManager implements PluginManager {
             loadedPlugin.instance.init(config);
             loadedPlugin.enabled = cfgModel.enabled();
             loadedPlugin.configModel = cfgModel;
-            loadedPlugin.initialized = true;
+            loadedPlugin.initialized = Boolean.TRUE;
         } catch (Exception e) {
             throw new GatewayException("Failed to init plugin config: " + pluginId, e);
         }
@@ -98,13 +100,16 @@ public class DefaultPluginManager implements PluginManager {
                         continue;
                     }
                     LoadedPlugin lp = plugins.get(binding.pluginId());
-                    if (lp == null || !lp.enabled) {
+                    if (lp == null) {
                         continue;
                     }
                     for (ExecutionPhase phase : lp.instance.getSupportedPhases()) {
                         phaseMap.computeIfAbsent(phase, k -> new ArrayList<>())
                                 .add(binding.pluginId());
                     }
+                    initOrUpdatePluginConfig(binding.pluginId(), new PluginConfigModel(binding.pluginId(),
+                            binding.enabled(),
+                            binding.config()));
                 }
             }
             newCache.put(route.id(), phaseMap);

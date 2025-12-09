@@ -1,0 +1,10 @@
+plugin:
+  id: header-rewrite
+  name: "Header Rewrite"
+  version: 1.0.0
+  description: "Rewrite HTTP headers"
+  entryClass: io.homeey.gateway.plugins.headerrewrite.HeaderRewritePlugin
+  supportedPhase:
+    - AFTER_UPSTREAM
+    - BEFORE_ROUTING
+  blocking: false
