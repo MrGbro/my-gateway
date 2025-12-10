@@ -126,13 +126,16 @@ public class DefaultPluginManager implements PluginManager {
                     continue;
                 }
                 LoadedPlugin lp = plugins.get(binding.pluginId());
-                if (lp == null || !lp.enabled) {
+                if (lp == null) {
                     continue;
                 }
                 for (ExecutionPhase phase : lp.instance.getSupportedPhases()) {
                     phaseMap.computeIfAbsent(phase, k -> new ArrayList<>())
                             .add(binding.pluginId());
                 }
+                initOrUpdatePluginConfig(route.id(), new PluginConfigModel(binding.pluginId(),
+                        binding.enabled(),
+                        binding.config()));
             }
         }
         routePhasePluginIds.put(route.id(), phaseMap);

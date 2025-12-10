@@ -43,12 +43,11 @@ public class HeaderRewritePlugin implements SyncGatewayPlugin {
         return Set.of(ExecutionPhase.BEFORE_ROUTING, ExecutionPhase.AFTER_UPSTREAM);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void init(PluginConfig config) throws GatewayException {
-        if (config instanceof MapBackedPluginConfig cfg) {
-            this.requestAdd = cfg.getMapDefault("requestAdd");
-            this.responseAdd = cfg.getMapDefault("responseAdd");
-        }
+        this.requestAdd = (Map<String, String>) config.configData().getOrDefault("requestAdd", null);
+        this.responseAdd = (Map<String, String>) config.configData().getOrDefault("responseAdd", null);
     }
 
     @Override
