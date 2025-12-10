@@ -7,6 +7,7 @@ import io.homeey.gateway.plugin.api.filter.GatewayFilterChain;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.function.Supplier;
 
 /**
  *
@@ -15,33 +16,31 @@ import java.util.concurrent.CompletionStage;
  **/
 public class DefaultGatewayFilterChain implements GatewayFilterChain {
 
-    private final List<GatewayFilter> filters;
+    private final List<? extends GatewayFilter> filters;
     private final int index;
-    private final UpstreamInvoker upstreamInvoker;
+    private final Supplier<CompletionStage<Void>> terminalSupplier;
 
-    public DefaultGatewayFilterChain(List<GatewayFilter> filters,
-                                     UpstreamInvoker upstreamInvoker) {
-        this.filters = filters;
-        this.index = 0;
-        this.upstreamInvoker = upstreamInvoker;
+    public DefaultGatewayFilterChain(List<? extends GatewayFilter> filters,
+                                     Supplier<CompletionStage<Void>> terminalSupplier) {
+        this(filters, 0, terminalSupplier);
     }
 
-    public DefaultGatewayFilterChain(List<GatewayFilter> filters,
+    public DefaultGatewayFilterChain(List<? extends GatewayFilter> filters,
                                      int index,
-                                     UpstreamInvoker upstreamInvoker) {
+                                     Supplier<CompletionStage<Void>> terminalSupplier) {
         this.filters = filters;
         this.index = index;
-        this.upstreamInvoker = upstreamInvoker;
+        this.terminalSupplier = terminalSupplier;
     }
 
 
     @Override
     public CompletionStage<Void> filter(GatewayContext context) {
         if (index == filters.size()) {
-            return upstreamInvoker.invoke(context);
+            return terminalSupplier.get();
         }
         GatewayFilter current = filters.get(index);
-        DefaultGatewayFilterChain next = new DefaultGatewayFilterChain(filters, index + 1, upstreamInvoker);
+        DefaultGatewayFilterChain next = new DefaultGatewayFilterChain(filters, index + 1, terminalSupplier);
         try {
             return current.filter(context, next);
         } catch (Throwable ex) {

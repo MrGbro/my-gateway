@@ -27,6 +27,10 @@ public class PluginResult {
         this.earlyResponse = earlyResponse;
     }
 
+    public static PluginResult success() {
+        return new PluginResult(true, true, null);
+    }
+
     public static PluginResult interrupt() {
         return new PluginResult(true, false, null);
     }

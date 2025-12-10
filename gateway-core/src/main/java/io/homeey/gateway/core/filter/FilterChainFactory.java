@@ -5,7 +5,6 @@ import io.homeey.gateway.plugin.api.filter.GatewayFilter;
 import io.homeey.gateway.routing.api.Route;
 import io.homeey.gateway.runtime.api.PluginManager;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
@@ -24,22 +23,11 @@ public class FilterChainFactory {
         this.businessExecutor = businessExecutor;
     }
 
-    public List<GatewayFilter> buildPreUpstreamFilters(Route route) {
-        List<GatewayFilter> filters = new ArrayList<>();
-
-        addPhaseFilters(filters, route, ExecutionPhase.BEFORE_ROUTING);
-        addPhaseFilters(filters, route, ExecutionPhase.AFTER_ROUTING);
-        addPhaseFilters(filters, route, ExecutionPhase.BEFORE_UPSTREAM);
-
-        return filters;
-    }
-
-    private void addPhaseFilters(List<GatewayFilter> filters,
-                                 Route route,
-                                 ExecutionPhase phase) {
-        pluginManager.getPluginsForRouteAndPhase(route, phase)
+    public List<? extends GatewayFilter> buildPreUpstreamFilters(Route route,
+                                                                 ExecutionPhase phase) {
+        return pluginManager.getPluginsForRouteAndPhase(route, phase)
                 .stream()
                 .map(plugin -> new PluginFilterAdapter(plugin, phase, businessExecutor))
-                .forEach(filters::add);
+                .toList();
     }
 }

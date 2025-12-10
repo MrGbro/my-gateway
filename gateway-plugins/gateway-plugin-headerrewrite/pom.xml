@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>gateway-plugin-headerrewrite</artifactId>
+    <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>25</maven.compiler.source>
